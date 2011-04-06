@@ -1,26 +1,27 @@
 import subprocess
 import re
+from optparse import OptionParser
 
-VERSION="0.0.1"
+VERSION="0.0.2"
 
 # TODO: Curses - http://www.tuxradar.com/content/code-project-build-ncurses-ui-python
-# TODO: getopt - http://docs.python.org/library/getopt.html
 
 class term:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
 
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
+	@classmethod
+	def disable ( klass ):
+		klass.HEADER = ''
+		klass.OKBLUE = ''
+		klass.OKGREEN = ''
+		klass.WARNING = ''
+		klass.FAIL = ''
+		klass.ENDC = ''
 
 class plogcat:
 
@@ -90,27 +91,44 @@ class plogcat:
 					print level + line + term.ENDC,
 		finally:
 			pipe.close()
-			print "Closed"
+			print "Pipe Closed"
 
 def main ():
 
+	parser = OptionParser()
+	parser.add_option( "-b", "--banfile", dest="ban_file", help="file of ban regexes", metavar="BANFILE", default=None )
+	parser.add_option( "-s", "--highlightfile", dest="highlight_file", help="file of highlight regexes", metavar="HIGHLIGHTFILE", default=None )
+	parser.add_option( "-p", "--plain", action="store_false", dest="color", default=True, help="no color")
+	(options, args) = parser.parse_args()
+
+	if not options.color:
+		term.disable()
+
 	pc = plogcat()
-	print
-	print term.HEADER + "Loading Bans..." + term.ENDC
-	print
-	pc.loadBanFile('banfile.txt')
-	print
-	print term.HEADER + "Loading Highlights..." + term.ENDC
-	print
-	pc.loadHighlightFile('highlightfile.txt')
+	if options.ban_file:
+		print
+		print term.HEADER + "Loading Bans..." + term.ENDC
+		print
+		pc.loadBanFile( options.ban_file )
+
+	if options.highlight_file:
+		print
+		print term.HEADER + "Loading Highlights..." + term.ENDC
+		print
+		pc.loadHighlightFile('highlightfile.txt')
+
 	print
 	print
 	print term.OKGREEN + "= Any Key To Continue = " + term.ENDC
 
-	raw_input()
-	print
+	try:
+		raw_input()
+		print
 
-	pc.run()
+		pc.run()
+	except KeyboardInterrupt:
+		print
+		print "Done!"
 
 
 if __name__ == "__main__":
