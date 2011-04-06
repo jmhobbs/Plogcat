@@ -1,0 +1,13 @@
+^E/BluetoothEventLoop.cpp
+^V/BluetoothEventRedirector
+^I/dun_service
+^D/XLEI-TRACE
+^D/WifiService
+^D/KeyguardUpdateMonitor
+^I/HardwareService
+^D/WindowManager
+^V/WifiMonitor
+^V/WifiStateTracker
+^D/NetworkStateTracker
+^D/TANGSS
+^I/LockScreen
