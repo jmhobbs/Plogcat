@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+
 import subprocess
 import re
+import json
 from optparse import OptionParser
 
-VERSION="0.0.2"
+VERSION="0.1.0"
 
 # TODO: Curses - http://www.tuxradar.com/content/code-project-build-ncurses-ui-python
 
@@ -41,7 +44,8 @@ class plogcat:
 	def loadBanFile ( self, ban_file, verbose = True ):
 		with open( ban_file, 'r' ) as bans:
 			for regex in bans:
-				self.addBan( regex, verbose )
+				if "#" != regex[0]:
+					self.addBan( regex, verbose )
 
 	def addBan ( self, regex, verbose = False ):
 		self.bans.append( re.compile( regex[:-1] ) )
@@ -51,7 +55,8 @@ class plogcat:
 	def loadHighlightFile ( self, highlight_file, verbose = True ):
 		with open( highlight_file, 'r' ) as highlights:
 			for regex in highlights:
-				self.addHighlight( regex, verbose )
+				if "#" != regex[0]:
+					self.addHighlight( regex, verbose )
 
 	def addHighlight ( self, regex, verbose = False ):
 		self.highlights.append( re.compile( regex[:-1] ) )
@@ -93,29 +98,47 @@ class plogcat:
 			pipe.close()
 			print "Pipe Closed"
 
+def safeget ( hash, key, default = False ):
+	try:
+		return hash[key]
+	except KeyError:
+		return default
+
 def main ():
 
 	parser = OptionParser()
+	parser.add_option( "-c", "--config", dest="config_file", help="json config options", metavar="CONFIG", default=None )
 	parser.add_option( "-b", "--banfile", dest="ban_file", help="file of ban regexes", metavar="BANFILE", default=None )
 	parser.add_option( "-s", "--highlightfile", dest="highlight_file", help="file of highlight regexes", metavar="HIGHLIGHTFILE", default=None )
 	parser.add_option( "-p", "--plain", action="store_false", dest="color", default=True, help="no color")
 	(options, args) = parser.parse_args()
 
-	if not options.color:
+	config = {}
+	if options.config_file:
+		with open(options.config_file, 'r') as config_file:
+			config = json.load( config_file )
+
+	if not options.color or safeget( config, "color", True ) == False:
 		term.disable()
 
 	pc = plogcat()
-	if options.ban_file:
+	if options.ban_file or safeget( config, "banfile", "" ) != "":
 		print
 		print term.HEADER + "Loading Bans..." + term.ENDC
 		print
-		pc.loadBanFile( options.ban_file )
+		if options.ban_file:
+			pc.loadBanFile( options.ban_file )
+		if safeget( config, "banfile", "" ) != "":
+			pc.loadBanFile( config["banfile"] )
 
-	if options.highlight_file:
+	if options.highlight_file or safeget( config, "highlightfile", "" ) != "":
 		print
 		print term.HEADER + "Loading Highlights..." + term.ENDC
 		print
-		pc.loadHighlightFile('highlightfile.txt')
+		if options.highlight_file:
+			pc.loadHighlightFile('highlightfile.txt')
+		if safeget( config, "highlightfile", "" ) != "":
+			pc.loadHighlightFile(config["highlightfile"])
 
 	print
 	print

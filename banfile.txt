@@ -1,13 +1,22 @@
-^E/BluetoothEventLoop.cpp
-^V/BluetoothEventRedirector
-^I/dun_service
-^D/XLEI-TRACE
-^D/WifiService
+##############################
+# This is an examle banfile  #
+# Lines beginning with # are # 
+# ignored.                   #
+##############################
+^D/BluetoothService
+^D/JBtl
 ^D/KeyguardUpdateMonitor
-^I/HardwareService
-^D/WindowManager
-^V/WifiMonitor
-^V/WifiStateTracker
 ^D/NetworkStateTracker
 ^D/TANGSS
+^D/WifiService
+^D/WindowManager
+^D/XLEI-TRACE
+^E/BluetoothEvent
+^I/CachedBluetoothDevice
+^I/HardwareService
 ^I/LockScreen
+^I/dun_service
+^V/BluetoothEvent
+^V/WifiMonitor
+^V/WifiStateTracker
+^[DI]/        \(
