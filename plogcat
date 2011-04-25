@@ -5,7 +5,7 @@ import re
 import json
 from optparse import OptionParser
 
-VERSION="0.1.0"
+VERSION="0.2.0"
 
 # TODO: Curses - http://www.tuxradar.com/content/code-project-build-ncurses-ui-python
 
@@ -143,15 +143,19 @@ def main ():
 	print
 	print
 	print term.OKGREEN + "= Any Key To Continue = " + term.ENDC
+	
+	raw_input()
+	print
 
-	try:
-		raw_input()
-		print
-
-		pc.run()
-	except KeyboardInterrupt:
-		print
-		print "Done!"
+	while True:
+		try:
+			pc.run()
+		except KeyboardInterrupt:
+			print
+			print "Done!"
+			exit(1)
+		except:
+			continue
 
 
 if __name__ == "__main__":
